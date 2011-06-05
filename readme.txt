@@ -3,8 +3,8 @@ Contributors: Ruhul Amin
 Donate link: http://www.tipsandtricks-hq.com/development-center
 Tags: CSV File to WordPress Database, CSV to DB, Upload Product Details to WordPress Database
 Requires at least: 2.7
-Tested up to: 2.9.2
-Stable tag: 1.0
+Tested up to: 3.1.3
+Stable tag: 1.6
 
 Simple WordPress plugin to insert CSV file content into WordPress database.
 

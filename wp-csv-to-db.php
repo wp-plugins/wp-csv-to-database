@@ -1,31 +1,104 @@
 <?php
 /*
 Plugin Name: WP CSV to Database
-Version: v1.0
+Version: v1.6
 Plugin URI: http://www.tipsandtricks-hq.com/?p=2116
 Author: Ruhul Amin
 Author URI: http://www.tipsandtricks-hq.com/
 Description: Simple WordPress plugin to insert CSV file content into WordPress database.
 */
 
-define('WP_CSV_TO_DB_VERSION', "1.0");
+define('WP_CSV_TO_DB_VERSION', "1.6");
 define('WP_CSV_TO_DB_FOLDER', dirname(plugin_basename(__FILE__)));
 define('WP_CSV_TO_DB_URL', WP_PLUGIN_URL.'/'.WP_CSV_TO_DB_FOLDER);
 
-function readAndDump($file_name,$table_name,$column_string="",$start_row=2)
+function csv_to_db_convert_to_domain_path_from_src_file($src_file)
+{	
+	$domain_path = "";
+	if(strpos($src_file,$_SERVER['SERVER_NAME']) !== false) //Full URL
+	{		
+	    $domain_path = 	csv_to_db_get_domain_path_from_url($src_file);
+	}
+	else //Relative URL
+	{
+		$domain_path = $src_file;
+	}
+	return $domain_path;
+}
+function csv_to_db_get_domain_path_from_url($src_file_url)
+{
+	$domain_url = $_SERVER['SERVER_NAME'];
+    $absolute_path_root = $_SERVER['DOCUMENT_ROOT'];
+
+    $domain_name_pos = strpos($src_file_url,$domain_url);
+    $domain_name_length = strlen($domain_url);
+    $total_length = $domain_name_pos + $domain_name_length;
+
+    //Get the absolute path for the file
+    $src_file = substr_replace($src_file_url,$absolute_path_root,0,$total_length);	
+    return $src_file;
+}
+function csv_to_db_url_to_absolute_path($src_file_url) {
+	// Converts $src_file_url into an absolute file path, starting at the server's root directory.
+	// Warning: Assumes $src_file_url is at, or below, the server's document root directory.  If the
+	// $src_file_url is outside the scope of the server's document root directory, a FALSE value will be returned.
+	// FALSE is also returned if $src_file_url is not a qualified URL.
+
+	if (preg_match("/^http/i", $src_file_url) != 1) return FALSE;	// Not a qualified URL.
+	$domain_url = $_SERVER['SERVER_NAME'];				// Get domain name.
+	$absolute_path_root = $_SERVER['DOCUMENT_ROOT'];		// Get absolute document root path.
+	// Calculate position in $src_file_url just after the domain name...
+	$domain_name_pos = stripos($src_file_url, $domain_url);
+	if($domain_name_pos === FALSE) return FALSE;			// Rats!  URL is not on this server.
+	$domain_name_length = strlen($domain_url);
+	$total_length = $domain_name_pos+$domain_name_length;
+	// Replace http*://SERVER_NAME in $src_file_url with the absolute document root path.
+	return substr_replace($src_file_url, $absolute_path_root, 0, $total_length);	
+}
+	
+function csv_to_db_get_relative_url_from_full_url($src_file_url)
+{
+	$relative_path_to_wpurl = '../../../..';
+	$wpurl = get_bloginfo('wpurl');
+	$relative_url = str_replace($wpurl,$relative_path_to_wpurl,$src_file_url);	
+    return $relative_url;
+}
+function csv_to_db_get_abs_path_from_src_file($src_file)
+{
+	if(preg_match("/http/",$src_file))
+	{
+		$relative_path = csv_to_db_get_relative_url_from_full_url($src_file);
+		$abs_path = realpath($relative_path);
+	}
+	else
+	{
+		$relative_path = $src_file;
+		$abs_path = realpath($relative_path);
+	}
+	return $abs_path;
+}
+
+function readAndDump($src_file,$table_name,$column_string="",$start_row=2)
 {
 	global $wpdb;
 	$errorMsg = "";
 
-	if(empty($file_name))
+	if(empty($src_file))
 	{
             $errorMsg .= "<br />Input file is not specified";
             return $errorMsg;
-        }
-
-	//$file_handle = fopen("products.csv", "r");
-	$file_handle = fopen($file_name, "r");
+    }
+	//$file_path = csv_to_db_convert_to_domain_path_from_src_file($src_file);
+	$file_path = csv_to_db_get_abs_path_from_src_file($src_file);
 	
+	$file_handle = fopen($file_path, "r");
+	if ($file_handle === FALSE) {
+		// File could not be opened...
+		$errorMsg .= 'Source file could not be opened!<br />';
+		$errorMsg .= "Error on fopen('$file_path')";	// Catch any fopen() problems.
+		return $errorMsg;
+	}
+		
 	$row = 1;
 	while (!feof($file_handle) ) 
 	{
@@ -41,10 +114,12 @@ function readAndDump($file_name,$table_name,$column_string="",$start_row=2)
 		
 		if ($columns>1)
 		{
-	        	$query_vals = "'".$line_of_text[0]."'";
+	        	$query_vals = "'".$wpdb->escape($line_of_text[0])."'";
 	        	for($c=1;$c<$columns;$c++)
 	        	{
-	                    $query_vals .= ",'".$line_of_text[$c]."'";
+	        		$line_of_text[$c] = utf8_encode($line_of_text[$c]);
+					$line_of_text[$c] = addslashes($line_of_text[$c]);
+	                $query_vals .= ",'".$wpdb->escape($line_of_text[$c])."'";
 	        	}
 	        	//echo "<br />Query Val: ".$query_vals."<br />";
                         $query = "INSERT INTO $table_name ($column_string) VALUES ($query_vals)";
@@ -171,7 +246,7 @@ function wpCsvToDBSettingsMenu()
     </td></tr>
 
     <tr valign="top"><td width="25%" align="left">
-    Column Names
+    Database Column Names
     </td><td align="left">
     <textarea name="wp_csvtodb_db_column_names" cols="70" rows="6"><?php echo get_option('wp_csvtodb_db_column_names'); ?></textarea>
     <br /><i>Column names seperated by comma (,). Leave empty if the values specified in the CSV file matches with the number of columns in the table.</i>
@@ -198,7 +273,7 @@ function wpCsvToDBSettingsMenu()
 	<form enctype="multipart/form-data" action="<?php echo $_SERVER["REQUEST_URI"]; ?>" method="POST">
 	<input type="hidden" name="file_upload" id="file_upload" value="true" />
 
-	<input type="hidden" name="MAX_FILE_SIZE" value="100000" />
+	<input type="hidden" name="MAX_FILE_SIZE" value="1000000" />
 	Choose a CSV file to upload: <input name="uploadedfile" type="file" /><br />
 	<input type="submit" value="Upload File" />
 
