@@ -1,14 +1,14 @@
 <?php
 /*
 Plugin Name: WP CSV to Database
-Version: v1.6
+Version: v1.7
 Plugin URI: http://www.tipsandtricks-hq.com/?p=2116
 Author: Ruhul Amin
 Author URI: http://www.tipsandtricks-hq.com/
 Description: Simple WordPress plugin to insert CSV file content into WordPress database.
 */
 
-define('WP_CSV_TO_DB_VERSION', "1.6");
+define('WP_CSV_TO_DB_VERSION', "1.7");
 define('WP_CSV_TO_DB_FOLDER', dirname(plugin_basename(__FILE__)));
 define('WP_CSV_TO_DB_URL', WP_PLUGIN_URL.'/'.WP_CSV_TO_DB_FOLDER);
 
@@ -88,8 +88,8 @@ function readAndDump($src_file,$table_name,$column_string="",$start_row=2)
             $errorMsg .= "<br />Input file is not specified";
             return $errorMsg;
     }
-	//$file_path = csv_to_db_convert_to_domain_path_from_src_file($src_file);
-	$file_path = csv_to_db_get_abs_path_from_src_file($src_file);
+	$file_path = csv_to_db_convert_to_domain_path_from_src_file($src_file);
+	//$file_path = csv_to_db_get_abs_path_from_src_file($src_file);
 	
 	$file_handle = fopen($file_path, "r");
 	if ($file_handle === FALSE) {
