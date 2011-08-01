@@ -1,82 +1,16 @@
 <?php
 /*
 Plugin Name: WP CSV to Database
-Version: v1.7
+Version: v1.8
 Plugin URI: http://www.tipsandtricks-hq.com/?p=2116
 Author: Ruhul Amin
 Author URI: http://www.tipsandtricks-hq.com/
-Description: Simple WordPress plugin to insert CSV file content into WordPress database.
+Description: Simple WordPress plugin to insert CSV file content into any WordPress database table.
 */
 
-define('WP_CSV_TO_DB_VERSION', "1.7");
+define('WP_CSV_TO_DB_VERSION', "1.8");
 define('WP_CSV_TO_DB_FOLDER', dirname(plugin_basename(__FILE__)));
-define('WP_CSV_TO_DB_URL', WP_PLUGIN_URL.'/'.WP_CSV_TO_DB_FOLDER);
-
-function csv_to_db_convert_to_domain_path_from_src_file($src_file)
-{	
-	$domain_path = "";
-	if(strpos($src_file,$_SERVER['SERVER_NAME']) !== false) //Full URL
-	{		
-	    $domain_path = 	csv_to_db_get_domain_path_from_url($src_file);
-	}
-	else //Relative URL
-	{
-		$domain_path = $src_file;
-	}
-	return $domain_path;
-}
-function csv_to_db_get_domain_path_from_url($src_file_url)
-{
-	$domain_url = $_SERVER['SERVER_NAME'];
-    $absolute_path_root = $_SERVER['DOCUMENT_ROOT'];
-
-    $domain_name_pos = strpos($src_file_url,$domain_url);
-    $domain_name_length = strlen($domain_url);
-    $total_length = $domain_name_pos + $domain_name_length;
-
-    //Get the absolute path for the file
-    $src_file = substr_replace($src_file_url,$absolute_path_root,0,$total_length);	
-    return $src_file;
-}
-function csv_to_db_url_to_absolute_path($src_file_url) {
-	// Converts $src_file_url into an absolute file path, starting at the server's root directory.
-	// Warning: Assumes $src_file_url is at, or below, the server's document root directory.  If the
-	// $src_file_url is outside the scope of the server's document root directory, a FALSE value will be returned.
-	// FALSE is also returned if $src_file_url is not a qualified URL.
-
-	if (preg_match("/^http/i", $src_file_url) != 1) return FALSE;	// Not a qualified URL.
-	$domain_url = $_SERVER['SERVER_NAME'];				// Get domain name.
-	$absolute_path_root = $_SERVER['DOCUMENT_ROOT'];		// Get absolute document root path.
-	// Calculate position in $src_file_url just after the domain name...
-	$domain_name_pos = stripos($src_file_url, $domain_url);
-	if($domain_name_pos === FALSE) return FALSE;			// Rats!  URL is not on this server.
-	$domain_name_length = strlen($domain_url);
-	$total_length = $domain_name_pos+$domain_name_length;
-	// Replace http*://SERVER_NAME in $src_file_url with the absolute document root path.
-	return substr_replace($src_file_url, $absolute_path_root, 0, $total_length);	
-}
-	
-function csv_to_db_get_relative_url_from_full_url($src_file_url)
-{
-	$relative_path_to_wpurl = '../../../..';
-	$wpurl = get_bloginfo('wpurl');
-	$relative_url = str_replace($wpurl,$relative_path_to_wpurl,$src_file_url);	
-    return $relative_url;
-}
-function csv_to_db_get_abs_path_from_src_file($src_file)
-{
-	if(preg_match("/http/",$src_file))
-	{
-		$relative_path = csv_to_db_get_relative_url_from_full_url($src_file);
-		$abs_path = realpath($relative_path);
-	}
-	else
-	{
-		$relative_path = $src_file;
-		$abs_path = realpath($relative_path);
-	}
-	return $abs_path;
-}
+define('WP_CSV_TO_DB_URL', plugins_url('',__FILE__));
 
 function readAndDump($src_file,$table_name,$column_string="",$start_row=2)
 {
@@ -88,8 +22,8 @@ function readAndDump($src_file,$table_name,$column_string="",$start_row=2)
             $errorMsg .= "<br />Input file is not specified";
             return $errorMsg;
     }
-	$file_path = csv_to_db_convert_to_domain_path_from_src_file($src_file);
-	//$file_path = csv_to_db_get_abs_path_from_src_file($src_file);
+
+	$file_path = csv_to_db_get_abs_path_from_src_file($src_file);	
 	
 	$file_handle = fopen($file_path, "r");
 	if ($file_handle === FALSE) {
@@ -138,6 +72,27 @@ function readAndDump($src_file,$table_name,$column_string="",$start_row=2)
 	fclose($file_handle);
 	
 	return $errorMsg;
+}
+
+function csv_to_db_get_abs_path_from_src_file($src_file)
+{
+	if(preg_match("/http/",$src_file))
+	{
+		$path = parse_url($src_file, PHP_URL_PATH);
+		$abs_path = $_SERVER['DOCUMENT_ROOT'].$path;
+		$abs_path = realpath($abs_path);
+		if(empty($abs_path)){
+			$wpurl = get_bloginfo('wpurl');
+			$abs_path = str_replace($wpurl,ABSPATH,$src_file);
+			$abs_path = realpath($abs_path);			
+		}
+	}
+	else
+	{
+		$relative_path = $src_file;
+		$abs_path = realpath($relative_path);
+	}
+	return $abs_path;
 }
 
 function wpCsvToDBSettingsMenu()
