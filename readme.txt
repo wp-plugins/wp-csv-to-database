@@ -1,6 +1,6 @@
 === WP CSV to Database - Insert CSV file content into WordPress database ===
 Contributors: Tips and Tricks HQ, Ruhul Amin, josh401
-Donate link: http://www.tipsandtricks-hq.com/development-center
+Donate link: https://www.tipsandtricks-hq.com/development-center
 Tags: csv, importer, spreadsheet, excel, import content, CSV File to WordPress Database, CSV to DB 
 Requires at least: 3.0
 Tested up to: 4.0
@@ -19,7 +19,7 @@ Useful when you want to bulk upload data from your CSV file (example: product de
 
 Bulk data import from CSV (Microsoft Excel) file. Bulk data export from your database to CSV file
 
-For detailed documentation please visit the [CSV to DB Plugin page](http://www.tipsandtricks-hq.com/wp-csv-to-database-plugin-import-excel-file-content-into-wordpress-database-2116)
+For detailed documentation please visit the [CSV to DB Plugin page](https://www.tipsandtricks-hq.com/wp-csv-to-database-plugin-import-excel-file-content-into-wordpress-database-2116)
 
 
 == Installation ==
@@ -36,7 +36,7 @@ Access the plugin's UI in the WordPres dashboard under the "Settings -> WP CSV/D
 2. Can this plugin be used to dump data into any WordPress database table? Yes.
 
 == Screenshots ==
-Visit the plugin page at http://www.tipsandtricks-hq.com/?p=2116 for screenshots more info.
+Visit the plugin page at https://www.tipsandtricks-hq.com/?p=2116 for screenshots more info.
 
 == Changelog ==
 
@@ -45,7 +45,7 @@ Visit the plugin page at http://www.tipsandtricks-hq.com/?p=2116 for screenshots
 
 = 1.8 and before =
 * The old versions with old architecture can be downloaded using the following link
-http://downloads.wordpress.org/plugin/wp-csv-to-database.v1.8.zip
+https://downloads.wordpress.org/plugin/wp-csv-to-database.v1.8.zip
 
 
 == Upgrade Notice ==
