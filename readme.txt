@@ -3,8 +3,8 @@ Contributors: Tips and Tricks HQ, Ruhul Amin, josh401
 Donate link: https://www.tipsandtricks-hq.com/development-center
 Tags: csv, importer, spreadsheet, excel, import content, CSV File to WordPress Database, CSV to DB 
 Requires at least: 3.0
-Tested up to: 4.0
-Stable tag: 2.0
+Tested up to: 4.1
+Stable tag: 2.1
 License: GPLv2 or later
 
 Simple WordPress plugin to insert CSV file content into WordPress database.
@@ -39,6 +39,9 @@ Access the plugin's UI in the WordPres dashboard under the "Settings -> WP CSV/D
 Visit the plugin page at https://www.tipsandtricks-hq.com/?p=2116 for screenshots more info.
 
 == Changelog ==
+
+= 2.1 =
+* WordPress 4.1 compatibility
 
 = 2.0 =
 * Complete new revamped architecture for this plugin. It is now a lot more user friendly and has more features.

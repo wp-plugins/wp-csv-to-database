@@ -3,7 +3,7 @@
  * Plugin Name: WP CSV TO DB
  * Plugin URI: http://www.tipsandtricks-hq.com/wp-csv-to-database-plugin-import-excel-file-content-into-wordpress-database-2116
  * Description: Import CSV file content directly into your WordPress database table.
- * Version: 2.0
+ * Version: 2.1
  * Author: Tips and Tricks HQ, josh401
  * Author URI: http://www.tipsandtricks-hq.com
  * License: GPL2
