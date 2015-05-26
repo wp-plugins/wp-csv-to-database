@@ -3,7 +3,7 @@ Contributors: Tips and Tricks HQ, Ruhul Amin, josh401
 Donate link: https://www.tipsandtricks-hq.com/development-center
 Tags: csv, importer, spreadsheet, excel, import content, CSV File to WordPress Database, CSV to DB 
 Requires at least: 3.0
-Tested up to: 4.1
+Tested up to: 4.2
 Stable tag: 2.1
 License: GPLv2 or later
 
